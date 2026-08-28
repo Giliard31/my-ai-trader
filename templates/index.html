@@ -7,26 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-        
-        body {
-            background-color: #030712;
-            color: #00ffcc;
-            font-family: 'Share Tech Mono', monospace;
-        }
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
-        }
-        .glow-box {
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.15);
-            border: 1px solid rgba(0, 255, 204, 0.3);
-        }
-        .glow-text {
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
-        }
-        .scanline {
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.3));
-            background-size: 100% 4px;
-        }
+        body { background-color: #030712; color: #00ffcc; font-family: 'Share Tech Mono', monospace; }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .glow-box { box-shadow: 0 0 20px rgba(0, 255, 204, 0.15); border: 1px solid rgba(0, 255, 204, 0.3); }
+        .glow-text { text-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
+        .scanline { background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.3)); background-size: 100% 4px; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8 scanline flex flex-col justify-between">
@@ -35,21 +20,39 @@
     <header class="flex justify-between items-center border-b border-cyan-800 pb-4 mb-6">
         <div>
             <h1 class="font-orbitron text-2xl md:text-4xl font-black tracking-wider glow-text text-cyan-400">NEURAL // IQ-CORE</h1>
-            <p class="text-xs text-cyan-600 tracking-widest">ESTRATÉGIA QUANTUM QUANTITATIVA V.4.2</p>
+            <p class="text-xs text-cyan-600 tracking-widest">SISTEMA QUANTUM COM AUTENTICAÇÃO SEGURA</p>
         </div>
         <div class="flex items-center gap-3">
-            <span class="inline-block w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
-            <span class="text-xs font-orbitron text-emerald-400">NEURAL LINK: ATIVO</span>
+            <span id="link-status" class="inline-block w-3 h-3 bg-rose-500 rounded-full"></span>
+            <span id="link-text" class="text-xs font-orbitron text-rose-400">AGUARDANDO LOGIN</span>
         </div>
     </header>
 
-    <!-- MAIN DISPLAY -->
-    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto">
+    <!-- TELA DE LOGIN NA PÁGINA -->
+    <div id="login-screen" class="max-w-md mx-auto my-auto glow-box bg-gray-950 p-8 rounded-xl w-full">
+        <h2 class="font-orbitron text-lg text-cyan-400 mb-4 text-center">AUTENTICAÇÃO DA CORRETORA</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs text-cyan-600 font-orbitron">E-MAIL</label>
+                <input type="email" id="iq-email" class="w-full bg-black border border-cyan-900 rounded p-2 text-cyan-300 mt-1 focus:outline-none focus:border-cyan-400" placeholder="seu-email@provedor.com">
+            </div>
+            <div>
+                <label class="text-xs text-cyan-600 font-orbitron">SENHA</label>
+                <input type="password" id="iq-password" class="w-full bg-black border border-cyan-900 rounded p-2 text-cyan-300 mt-1 focus:outline-none focus:border-cyan-400" placeholder="********">
+            </div>
+            <button onclick="conectarCorretora()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-bold py-3 rounded transition shadow-[0_0_15px_rgba(0,255,204,0.4)]">
+                INICIAR NEURAL LINK
+            </button>
+            <p id="error-msg" class="text-xs text-rose-500 text-center font-bold"></p>
+        </div>
+    </div>
+
+    <!-- MAIN DISPLAY (Fica oculto até logar) -->
+    <main id="dashboard-screen" class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto hidden">
         
-        <!-- PAINEL DE SINAL AO VIVO -->
         <div class="lg:col-span-2 glow-box bg-gray-950/80 p-6 rounded-xl relative overflow-hidden">
             <div class="absolute top-0 right-0 bg-cyan-950 text-cyan-400 px-4 py-1 text-xs font-orbitron border-l border-b border-cyan-800">
-                LIVE FEED
+                LIVE FEED REAL
             </div>
             
             <div class="flex items-center justify-between mb-4">
@@ -60,7 +63,7 @@
             <div class="grid grid-cols-2 gap-4 my-6">
                 <div class="bg-black/50 p-4 rounded border border-cyan-900">
                     <p class="text-xs text-cyan-600 font-orbitron">DIREÇÃO SUGERIDA</p>
-                    <p id="signal-action" class="text-xl font-bold font-orbitron mt-1">AGUARDANDO...</p>
+                    <p id="signal-action" class="text-xl font-bold font-orbitron mt-1">ANALISANDO...</p>
                 </div>
                 <div class="bg-black/50 p-4 rounded border border-cyan-900">
                     <p class="text-xs text-cyan-600 font-orbitron">CONFIANÇA DA IA</p>
@@ -68,79 +71,92 @@
                 </div>
             </div>
 
-            <!-- COMENTARISTA DE MERCADO (IA) -->
             <div class="bg-cyan-950/20 border-l-4 border-cyan-400 p-4 rounded-r">
                 <p class="text-xs font-orbitron text-cyan-400 mb-1">🎙️ ANÁLISE DO COMENTARISTA TRADER:</p>
-                <p id="ai-commentary" class="text-sm md:text-base text-gray-300 italic">"Sincronizando com os livros de ofertas da corretora e indicadores de momento..."</p>
+                <p id="ai-commentary" class="text-sm md:text-base text-gray-300 italic">"Conectado ao livro de ofertas real..."</p>
             </div>
         </div>
 
-        <!-- PAINEL LATERAL DE METRICAS -->
         <div class="glow-box bg-gray-950/80 p-6 rounded-xl flex flex-col justify-between">
             <div>
                 <h2 class="font-orbitron text-sm text-cyan-400 border-b border-cyan-900 pb-2 mb-4">ESTATÍSTICAS DA SESSÃO</h2>
                 <div class="space-y-4 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Assertividade:</span>
-                        <span class="text-emerald-400 font-bold">89.4%</span>
+                        <span class="text-gray-500">Status:</span>
+                        <span class="text-emerald-400 font-bold">Autenticado</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-500">Ordens Analisadas:</span>
-                        <span class="text-white font-bold" id="counter">142</span>
+                        <span class="text-white font-bold" id="counter">0</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Latência Neural:</span>
-                        <span class="text-cyan-300">14ms</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Modo Operacional:</span>
-                        <span class="text-yellow-400">ESTRATÉGICO (M1/M5)</span>
+                        <span class="text-gray-500">Latência:</span>
+                        <span class="text-cyan-300">18ms</span>
                     </div>
                 </div>
             </div>
-            <div class="mt-6">
-                <button onclick="triggerManualScan()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-bold py-3 rounded transition shadow-[0_0_15px_rgba(0,255,204,0.4)]">
-                    FORÇAR SCAN QUANTUM
-                </button>
-            </div>
         </div>
-
     </main>
 
-    <!-- FOOTER -->
     <footer class="text-center text-xs text-cyan-700 mt-6 pt-4 border-t border-cyan-950">
         SISTEMA NÃO OFICIAL // PARA FINS DE ESTUDO E PESQUISA EM ENGENHARIA FINANCEIRA.
     </footer>
 
     <script>
-        let count = 142;
-        const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
-        const ws = new WebSocket(wsUrl);
+        let count = 0;
+        let ws = null;
 
-        ws.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            
-            document.getElementById('asset-name').innerText = data.asset;
-            document.getElementById('asset-price').innerText = data.price;
-            
-            const actionEl = document.getElementById('signal-action');
-            actionEl.innerText = data.action;
-            if(data.action.includes("COMPRA")) {
-                actionEl.className = "text-xl font-bold font-orbitron mt-1 text-emerald-400 glow-text";
-            } else {
-                actionEl.className = "text-xl font-bold font-orbitron mt-1 text-rose-500 glow-text";
+        function conectarCorretora() {
+            const email = document.getElementById('iq-email').value;
+            const password = document.getElementById('iq-password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!email || !password) {
+                errorMsg.innerText = "Preencha o e-mail e a senha!";
+                return;
             }
 
-            document.getElementById('signal-confidence').innerText = data.confidence;
-            document.getElementById('ai-commentary').innerText = `"${data.commentary}"`;
-            
-            count++;
-            document.getElementById('counter').innerText = count;
-        };
+            errorMsg.innerText = "Conectando à corretora...";
 
-        function triggerManualScan() {
-            alert("Varredura profunda do book de ofertas iniciada via Inteligência Artificial!");
+            const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const wsUrl = `${wsProtocol}//${window.location.host}/ws/${encodeURIComponent(email)}/${encodeURIComponent(password)}`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+                document.getElementById('link-status').className = "inline-block w-3 h-3 bg-emerald-500 rounded-full animate-ping";
+                document.getElementById('link-text').className = "text-xs font-orbitron text-emerald-400";
+                document.getElementById('link-text').innerText = "NEURAL LINK: ATIVO";
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if(data.error) {
+                    alert(data.error);
+                    location.reload();
+                    return;
+                }
+                
+                document.getElementById('asset-name').innerText = data.asset;
+                document.getElementById('asset-price').innerText = data.price;
+                
+                const actionEl = document.getElementById('signal-action');
+                actionEl.innerText = data.action;
+                actionEl.className = "text-xl font-bold font-orbitron mt-1 text-emerald-400 glow-text";
+
+                document.getElementById('signal-confidence').innerText = data.confidence;
+                document.getElementById('ai-commentary').innerText = `"${data.commentary}"`;
+                
+                count++;
+                document.getElementById('counter').innerText = count;
+            };
+
+            ws.onerror = function() {
+                errorMsg.innerText = "Falha na conexão com o servidor WebSocket.";
+            };
         }
     </script>
 </body>
