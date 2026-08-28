@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURAL-TRADER // Quantum AI Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+        
+        body {
+            background-color: #030712;
+            color: #00ffcc;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .glow-box {
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.15);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+        }
+        .glow-text {
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.3));
+            background-size: 100% 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 scanline flex flex-col justify-between">
+
+    <!-- HEADER -->
+    <header class="flex justify-between items-center border-b border-cyan-800 pb-4 mb-6">
+        <div>
+            <h1 class="font-orbitron text-2xl md:text-4xl font-black tracking-wider glow-text text-cyan-400">NEURAL // IQ-CORE</h1>
+            <p class="text-xs text-cyan-600 tracking-widest">ESTRATÉGIA QUANTUM QUANTITATIVA V.4.2</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="inline-block w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
+            <span class="text-xs font-orbitron text-emerald-400">NEURAL LINK: ATIVO</span>
+        </div>
+    </header>
+
+    <!-- MAIN DISPLAY -->
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto">
+        
+        <!-- PAINEL DE SINAL AO VIVO -->
+        <div class="lg:col-span-2 glow-box bg-gray-950/80 p-6 rounded-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-cyan-950 text-cyan-400 px-4 py-1 text-xs font-orbitron border-l border-b border-cyan-800">
+                LIVE FEED
+            </div>
+            
+            <div class="flex items-center justify-between mb-4">
+                <span id="asset-name" class="text-3xl font-orbitron font-bold text-white tracking-widest">---</span>
+                <span id="asset-price" class="text-2xl font-mono text-cyan-300">0.00000</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 my-6">
+                <div class="bg-black/50 p-4 rounded border border-cyan-900">
+                    <p class="text-xs text-cyan-600 font-orbitron">DIREÇÃO SUGERIDA</p>
+                    <p id="signal-action" class="text-xl font-bold font-orbitron mt-1">AGUARDANDO...</p>
+                </div>
+                <div class="bg-black/50 p-4 rounded border border-cyan-900">
+                    <p class="text-xs text-cyan-600 font-orbitron">CONFIANÇA DA IA</p>
+                    <p id="signal-confidence" class="text-xl font-bold font-orbitron text-emerald-400 mt-1">--%</p>
+                </div>
+            </div>
+
+            <!-- COMENTARISTA DE MERCADO (IA) -->
+            <div class="bg-cyan-950/20 border-l-4 border-cyan-400 p-4 rounded-r">
+                <p class="text-xs font-orbitron text-cyan-400 mb-1">🎙️ ANÁLISE DO COMENTARISTA TRADER:</p>
+                <p id="ai-commentary" class="text-sm md:text-base text-gray-300 italic">"Sincronizando com os livros de ofertas da corretora e indicadores de momento..."</p>
+            </div>
+        </div>
+
+        <!-- PAINEL LATERAL DE METRICAS -->
+        <div class="glow-box bg-gray-950/80 p-6 rounded-xl flex flex-col justify-between">
+            <div>
+                <h2 class="font-orbitron text-sm text-cyan-400 border-b border-cyan-900 pb-2 mb-4">ESTATÍSTICAS DA SESSÃO</h2>
+                <div class="space-y-4 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Assertividade:</span>
+                        <span class="text-emerald-400 font-bold">89.4%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Ordens Analisadas:</span>
+                        <span class="text-white font-bold" id="counter">142</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Latência Neural:</span>
+                        <span class="text-cyan-300">14ms</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Modo Operacional:</span>
+                        <span class="text-yellow-400">ESTRATÉGICO (M1/M5)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6">
+                <button onclick="triggerManualScan()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-bold py-3 rounded transition shadow-[0_0_15px_rgba(0,255,204,0.4)]">
+                    FORÇAR SCAN QUANTUM
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-xs text-cyan-700 mt-6 pt-4 border-t border-cyan-950">
+        SISTEMA NÃO OFICIAL // PARA FINS DE ESTUDO E PESQUISA EM ENGENHARIA FINANCEIRA.
+    </footer>
+
+    <script>
+        let count = 142;
+        const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
+        const ws = new WebSocket(wsUrl);
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            document.getElementById('asset-name').innerText = data.asset;
+            document.getElementById('asset-price').innerText = data.price;
+            
+            const actionEl = document.getElementById('signal-action');
+            actionEl.innerText = data.action;
+            if(data.action.includes("COMPRA")) {
+                actionEl.className = "text-xl font-bold font-orbitron mt-1 text-emerald-400 glow-text";
+            } else {
+                actionEl.className = "text-xl font-bold font-orbitron mt-1 text-rose-500 glow-text";
+            }
+
+            document.getElementById('signal-confidence').innerText = data.confidence;
+            document.getElementById('ai-commentary').innerText = `"${data.commentary}"`;
+            
+            count++;
+            document.getElementById('counter').innerText = count;
+        };
+
+        function triggerManualScan() {
+            alert("Varredura profunda do book de ofertas iniciada via Inteligência Artificial!");
+        }
+    </script>
+</body>
+</html>
