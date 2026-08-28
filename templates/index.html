@@ -16,11 +16,10 @@
 </head>
 <body class="min-h-screen p-4 md:p-8 scanline flex flex-col justify-between">
 
-    <!-- HEADER -->
     <header class="flex justify-between items-center border-b border-cyan-800 pb-4 mb-6">
         <div>
-            <h1 class="font-orbitron text-2xl md:text-4xl font-black tracking-wider glow-text text-cyan-400">NEURAL // IQ-CORE</h1>
-            <p class="text-xs text-cyan-600 tracking-widest">SISTEMA QUANTUM COM AUTENTICAÇÃO SEGURA</p>
+            <h1 class="font-orbitron text-2xl md:text-4xl font-black tracking-wider glow-text text-cyan-400">NEURAL // QUANTUM BOT</h1>
+            <p class="text-xs text-cyan-600 tracking-widest">MONITORAMENTO DE BANCA E EXECUÇÃO IA</p>
         </div>
         <div class="flex items-center gap-3">
             <span id="link-status" class="inline-block w-3 h-3 bg-rose-500 rounded-full"></span>
@@ -28,13 +27,165 @@
         </div>
     </header>
 
-    <!-- TELA DE LOGIN NA PÁGINA -->
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="max-w-md mx-auto my-auto glow-box bg-gray-950 p-8 rounded-xl w-full">
-        <h2 class="font-orbitron text-lg text-cyan-400 mb-4 text-center">AUTENTICAÇÃO DA CORRETORA</h2>
+        <h2 class="font-orbitron text-lg text-cyan-400 mb-4 text-center">AUTENTICAÇÃO DA SESSÃO</h2>
         <div class="space-y-4">
             <div>
                 <label class="text-xs text-cyan-600 font-orbitron">E-MAIL</label>
                 <input type="email" id="iq-email" class="w-full bg-black border border-cyan-900 rounded p-2 text-cyan-300 mt-1 focus:outline-none focus:border-cyan-400" placeholder="seu-email@provedor.com">
+            </div>
+            <div>
+                <label class="text-xs text-cyan-600 font-orbitron">SENHA</label>
+                <input type="password" id="iq-password" class="w-full bg-black border border-cyan-900 rounded p-2 text-cyan-300 mt-1 focus:outline-none focus:border-cyan-400" placeholder="********">
+            </div>
+            <button onclick="conectarCorretora()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-bold py-3 rounded transition shadow-[0_0_15px_rgba(0,255,204,0.4)]">
+                ACESSAR TERMINAL COM BANCA REAL
+            </button>
+            <p id="error-msg" class="text-xs text-rose-500 text-center font-bold"></p>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <main id="dashboard-screen" class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto hidden">
+        
+        <div class="lg:col-span-2 glow-box bg-gray-950/80 p-6 rounded-xl relative overflow-hidden">
+            <div id="badge-status" class="absolute top-0 right-0 bg-cyan-950 text-cyan-400 px-4 py-1 text-xs font-orbitron border-l border-b border-cyan-800">
+                MONITORANDO MERCADO
+            </div>
+            
+            <div class="flex items-center justify-between mb-4">
+                <span id="asset-name" class="text-3xl font-orbitron font-bold text-white tracking-widest">---</span>
+                <span id="asset-price" class="text-2xl font-mono text-cyan-300">0.00000</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 my-6">
+                <div class="bg-black/50 p-3 rounded border border-cyan-900">
+                    <p class="text-[10px] text-cyan-600 font-orbitron">DIREÇÃO</p>
+                    <p id="signal-action" class="text-sm font-bold font-orbitron mt-1">---</p>
+                </div>
+                <div class="bg-black/50 p-3 rounded border border-cyan-900">
+                    <p class="text-[10px] text-cyan-600 font-orbitron">ENTRADA</p>
+                    <p id="entry-time" class="text-sm font-bold font-orbitron text-white mt-1">--:--:--</p>
+                </div>
+                <div class="bg-black/50 p-3 rounded border border-cyan-900">
+                    <p class="text-[10px] text-cyan-600 font-orbitron">EXPIRAÇÃO (M2)</p>
+                    <p id="exp-time" class="text-sm font-bold font-orbitron text-yellow-400 mt-1">--:--:--</p>
+                </div>
+            </div>
+
+            <div id="result-box" class="bg-black/80 border border-cyan-900 p-4 rounded text-center my-4 hidden">
+                <p class="text-xs font-orbitron text-cyan-400">APURAÇÃO DA OPERAÇÃO:</p>
+                <p id="result-text" class="text-2xl font-black font-orbitron mt-1">AGUARDANDO...</p>
+            </div>
+
+            <div class="bg-cyan-950/20 border-l-4 border-cyan-400 p-4 rounded-r">
+                <p class="text-xs font-orbitron text-cyan-400 mb-1">🎙️ ANÁLISE DO COMENTARISTA TRADER:</p>
+                <p id="ai-commentary" class="text-sm text-gray-300 italic">"Aguardando gatilho de preço..."</p>
+            </div>
+        </div>
+
+        <!-- PAINEL LATERAL COM A BANCA ATUALIZADA -->
+        <div class="glow-box bg-gray-950/80 p-6 rounded-xl flex flex-col justify-between">
+            <div>
+                <h2 class="font-orbitron text-sm text-cyan-400 border-b border-cyan-900 pb-2 mb-4">ESTATÍSTICAS DA CONTA</h2>
+                <div class="space-y-4 text-sm">
+                    <div class="bg-black/60 p-4 rounded border border-cyan-900 text-center mb-4">
+                        <span class="text-xs text-cyan-600 font-orbitron block">SALDO DA BANCA</span>
+                        <span id="account-balance" class="text-2xl font-bold font-orbitron text-emerald-400">$0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Placar Geral:</span>
+                        <span id="score-board" class="text-emerald-400 font-bold">0 Win / 0 Loss</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Status Do Bot:</span>
+                        <span class="text-cyan-300 font-bold">Operando Real</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center text-xs text-cyan-700 mt-6 pt-4 border-t border-cyan-950">
+        SISTEMA NÃO OFICIAL // PARA FINS DE ESTUDO E PESQUISA EM ENGENHARIA FINANCEIRA.
+    </footer>
+
+    <script>
+        let wins = 0;
+        let losses = 0;
+        let ws = null;
+
+        function conectarCorretora() {
+            const email = document.getElementById('iq-email').value;
+            const password = document.getElementById('iq-password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!email || !password) {
+                errorMsg.innerText = "Preencha os campos!";
+                return;
+            }
+
+            const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const wsUrl = `${wsProtocol}//${window.location.host}/ws/${encodeURIComponent(email)}/${encodeURIComponent(password)}`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+                document.getElementById('link-status').className = "inline-block w-3 h-3 bg-emerald-500 rounded-full animate-ping";
+                document.getElementById('link-text').className = "text-xs font-orbitron text-emerald-400";
+                document.getElementById('link-text').innerText = "BANCA CONECTADA";
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if(data.error) {
+                    alert(data.error);
+                    location.reload();
+                    return;
+                }
+
+                // Atualiza o saldo da banca em tempo real na tela
+                if(data.balance !== undefined) {
+                    document.getElementById('account-balance').innerText = `$${data.balance.toFixed(2)}`;
+                }
+
+                if(data.status === "ANALISANDO") {
+                    document.getElementById('result-box').classList.add('hidden');
+                    document.getElementById('badge-status').innerText = "SINAL ENVIADO // AGUARDANDO EXPIRAÇÃO";
+                    document.getElementById('asset-name').innerText = data.asset;
+                    document.getElementById('asset-price').innerText = data.price;
+                    document.getElementById('signal-action').innerText = data.action;
+                    document.getElementById('entry-time').innerText = data.entry_time;
+                    document.getElementById('exp-time').innerText = data.expiration_time;
+                    document.getElementById('ai-commentary').innerText = `"${data.commentary}"`;
+                } 
+                else if(data.status === "FINALIZADO") {
+                    document.getElementById('badge-status').innerText = "OPERAÇÃO FINALIZADA";
+                    const resultBox = document.getElementById('result-box');
+                    const resultText = document.getElementById('result-text');
+                    
+                    resultBox.classList.remove('hidden');
+                    resultText.innerText = data.result;
+
+                    if(data.result.includes("WIN")) {
+                        wins++;
+                        resultText.className = "text-2xl font-black font-orbitron mt-1 text-emerald-400 glow-text";
+                    } else {
+                        losses++;
+                        resultText.className = "text-2xl font-black font-orbitron mt-1 text-rose-500 glow-text";
+                    }
+
+                    document.getElementById('score-board').innerText = `${wins} Win / ${losses} Loss`;
+                }
+            };
+        }
+    </script>
+</body>
+</html>                <input type="email" id="iq-email" class="w-full bg-black border border-cyan-900 rounded p-2 text-cyan-300 mt-1 focus:outline-none focus:border-cyan-400" placeholder="seu-email@provedor.com">
             </div>
             <div>
                 <label class="text-xs text-cyan-600 font-orbitron">SENHA</label>
